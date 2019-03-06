@@ -17,6 +17,7 @@
 #endif
 
 #include "pwgen.h"
+#include "CBack-1.0/SRC/CBack.h"
 
 /* Globals variables */
 int (*pw_number)(int max_num);
@@ -91,11 +92,11 @@ int main(int argc, char **argv)
 	int	term_width = 80;
 	int	c, i;
 	int	num_cols = -1;
-	char	*buf, *tmp;
+	char	*tmp;
 	void	(*pwgen)(char *inbuf, int size, int pw_flags);
 
 	pwgen = pw_phonemes;
-	pw_number = pw_random_number;
+	pw_number = Choice; // pw_random_number;
 	if (isatty(1)) {
 		do_columns = 1;
 		pwgen_flags |= PW_DIGITS | PW_UPPERS;
@@ -195,21 +196,25 @@ int main(int argc, char **argv)
 	}
 	if (num_pw < 0)
 		num_pw = do_columns ? num_cols * 20 : 1;
-	
-	buf = malloc(pw_length+1);
-	if (!buf) {
-		fprintf(stderr, "Couldn't malloc password buffer.\n");
-		exit(1);
+
+	{
+	  char buf[pw_length+1]; //  = malloc(pw_length+1);
+	  /* if (!buf) { */
+	  /*   fprintf(stderr, "Couldn't malloc password buffer.\n"); */
+	  /*   exit(1); */
+	  /* } */
+	  for (i=0; i < num_pw; i++) {
+	    pwgen((char *) buf, pw_length, pwgen_flags);
+	    /* if (!do_columns || ((i % num_cols) == (num_cols-1))) */
+	    /*   printf("%s\n", buf); */
+	    /* else */
+	    /*   printf("%s ", buf); */
+	  }
+	  /* if ((num_cols > 1) && ((i % num_cols) != 0)) */
+	  /*   fputc('\n', stdout); */
+	  // free(buf);
+	  while (true)
+	    Backtrack();
 	}
-	for (i=0; i < num_pw; i++) {
-		pwgen(buf, pw_length, pwgen_flags);
-		if (!do_columns || ((i % num_cols) == (num_cols-1)))
-			printf("%s\n", buf);
-		else
-			printf("%s ", buf);
-	}
-	if ((num_cols > 1) && ((i % num_cols) != 0))
-		fputc('\n', stdout);
-	free(buf);
 	return 0;
 }

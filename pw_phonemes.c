@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "pwgen.h"
+#include "CBack-1.0/SRC/CBack.h"
 
 struct pw_element elements[] = {
 	{ "a",	VOWEL },
@@ -116,8 +117,11 @@ try_again:
 		c += len;
 		
 		/* Time to stop? */
-		if (c >= size)
-			break;
+		if (c >= size) {
+		  printf("%s\n", c);
+		  Backtrack();
+		  // break;
+		}
 		
 		/*
 		 * Handle PW_DIGITS
@@ -170,6 +174,9 @@ try_again:
 		prev = flags;
 		first = 0;
 	}
-	if (feature_flags & (PW_UPPERS | PW_DIGITS | PW_SYMBOLS))
-		goto try_again;
+	if (feature_flags & (PW_UPPERS | PW_DIGITS | PW_SYMBOLS)) {
+	  // Unnecessary to try_again since we are performing all possible branches
+	  Backtrack();
+	  // goto try_again;
+	}
 }
